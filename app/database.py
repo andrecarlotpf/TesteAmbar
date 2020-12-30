@@ -42,10 +42,9 @@ def insert_into_db(forecast_json):
                         rain_prob, temp_max, temp_min)))
     
     with connecta_banco() as con:
-        
-        con.cursor().executemany('INSERT INTO Forecast VALUES (NULL,?,?,?,?,?,?,?,?)', l)
-        con.commit()
-        
+        for tupla in l:
+            con.cursor().execute('INSERT OR IGNORE INTO Forecast VALUES (NULL,?,?,?,?,?,?,?,?)', tupla)
+            con.commit()
     return 1
 
 def analise(data_inicial, data_final):

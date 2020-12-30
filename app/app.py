@@ -15,15 +15,7 @@ class ApiIntegracao(object):
 
     def get_token(self):
         return open('./keys','r').read()
-    """
-        url = ex.: http:localhost:3000/api/?/consulta
-        get_params(url='url',params=['n','n1'...,'token'] )
-    
-    def get_params(self, **kwargs):
-        url = kwargs.get('url')
-        params = kwargs.get('params')
-        for i in range(len(params)-1):
-    """
+
     def executa_url(self, method: str, data=None):
         if method.upper() == 'GET':
             return requests.get(self.url)
@@ -62,7 +54,6 @@ required=True)
 cidadesync_model_request = api.model('CidadeSyncRequest',{
         'id_cidade': fields.Integer
 })
-
 
 @api.doc(params={'id_cidade':'Id da cidade a sincronizar'})
 class CidadeSync(Resource):
