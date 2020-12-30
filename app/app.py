@@ -4,8 +4,9 @@ import requests
 import database as db
 import os.path
 app = Flask(__name__)
-api = Api(app)
+api = Api(app, version='2.0', title='Teste AmbarTech')
 
+ns = api.namespace('forecast')
 
 class ApiIntegracao(object):
     def __init__(self, id_cliente):
@@ -36,10 +37,11 @@ analise_model_response = api.model('AnaliseResponse',{
         'temperatura_max': fields.Integer,
         'precipitacao_avg': fields.Float
 })
-@api.doc(params={'data_inicial':'String no formato YYYY-MM-DD'})
-@api.doc(params={'data_final':'String no formato YYYY-MM-DD'})
+@ns.doc(params={'data_inicial':'String no formato YYYY-MM-DD'})
+@ns.doc(params={'data_final':'String no formato YYYY-MM-DD'})
 class Analise(Resource):
-    @api.marshal_with(analise_model_response)
+    @ns.doc('Cidade mais quente')
+    @ns.marshal_with(analise_model_response)
     def get(self):
         args = analise_parser.parse_args()
         retorno = db.analise(args['data_inicial'],args['data_final'])
@@ -55,9 +57,9 @@ cidadesync_model_request = api.model('CidadeSyncRequest',{
         'id_cidade': fields.Integer
 })
 
-@api.doc(params={'id_cidade':'Id da cidade a sincronizar'})
+@ns.doc(params={'id_cidade':'Id da cidade a sincronizar'})
 class CidadeSync(Resource):
-    @api.marshal_with(cidadesync_model_request)
+    @ns.expect(cidadesync_model_request)
     def post(self):
         args = cidadesync_parser.parse_args()
         
@@ -71,8 +73,8 @@ class CidadeSync(Resource):
             return "Erro"
 
 
-api.add_resource(CidadeSync, '/api/v2/cidade', endpoint='cidade_ep')
-api.add_resource(Analise, '/api/v2/analise', endpoint='analise_ep')
+ns.add_resource(CidadeSync, '/api/v2/cidade', endpoint='cidade_ep')
+ns.add_resource(Analise, '/api/v2/analise', endpoint='analise_ep')
 
 if __name__ == '__main__':
     if os.path.isfile('./database/webservice.db'):
