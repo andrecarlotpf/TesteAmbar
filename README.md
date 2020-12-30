@@ -1,2 +1,0 @@
-# TesteAmbar
-Projeto Teste AmbarTech

@@ -1,4 +1,0 @@
-./app/keys
-__pycache__/
-./database/webservice.db
-.gitignore
