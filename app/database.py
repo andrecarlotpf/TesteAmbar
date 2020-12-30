@@ -54,15 +54,13 @@ def analise(data_inicial, data_final):
                 '''
         return formata_retorno(con.cursor()
                                     .execute(sql, (data_inicial, data_final))
-                                    .fetchall()
-                              )
-    
-#    return 
+                                    .fetchall())
 
 
 def formata_retorno(retorno):
     l = []
     for linha in retorno:
         l.append({'cidade':linha[0], 'temperatura_max':linha[1],'precipitacao_avg':linha[2]})
+    print(l)
     return l
 

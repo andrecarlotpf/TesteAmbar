@@ -1,45 +1,53 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from flask import Flask
+from flask_restx import Resource, Api, reqparse, fields
 import database as db
-import requests as rq
-from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
-
-token = None
-with open('keys','r') as f:
-    token = f.readline()
-
-base = 'http://apiadvisor.climatempo.com.br/api/v1'
+api = Api(app)
 
 
-def url_maker(id: int):
-    params = '/forecast/locale/%d/days/15?token=%s' % (id, token)
-    return base+params
-
-@app.route('/start_database')
-def init_database():
-    if db.create_database():
-        return jsonify({'status':'200'})
+#api.add_resource(CidadeSync, '/api/v2/cidade', endpoint='cidade_ep')
 
 
-@app.route('/api/cidade/<int:id>/', methods=['POST', 'GET'])
-def sync_forecast(id: int=None):
-    if request.method == 'POST':
-        r = rq.get(url_maker(id))
-        if db.insert_into_db(r.json()):
-            return jsonify({'status':200})
-    else:
-        abort(501, description='Url only receive POST')
+parser = reqparse.RequestParser()
+parser.add_argument('id_cidade', type=int, help='Id da cidade para sincronizar',
+required=True)
 
-@app.route('/api/analise/', methods=['POST','GET'])
-def analise():
-    if request.method == 'GET':
-        data_inicial = request.args.get('data_inicial')
-        data_final = request.args.get('data_final')
-        return jsonify({"result":db.analise(data_inicial, data_final)})
-     
+analise_parser = reqparse.RequestParser()
+analise_parser.add_argument('data_inicial', type=str, help='String formato YYYY-MM-DD',
+required=True)
+analise_parser.add_argument('data_final', type=str, help='String formato YYYY-MM-DD',
+required=True)
+
+analise = api.model('Analise',{
+        'cidade':fields.String,
+        'temperatura_max': fields.Integer,
+        'precipitacao_avg': fields.Float
+})
+
+
+@api.route('/api/v2/analise', endpoint='analise_ep')
+@api.doc(params={'data_inicial':'String no formato YYYY-MM-DD'})
+@api.doc(params={'data_final':'String no formato YYYY-MM-DD'})
+class Analise(Resource):
+    @api.marshal_with(analise)
+    def post(self):
+        args = analise_parser.parse_args()
+        retorno = db.analise(args['data_inicial'],args['data_final'])
+        return retorno, 200
+
+
+@api.route('/api/v2/cidade', endpoint='cidade_ep')
+class CidadeSync(Resource):
+
+    def get(self):
+        return {'Get':'Ok'}, 201
+
+    def post(self):
+        args = parser.parse_args()
+        return {1:args['id_cidade']}
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
