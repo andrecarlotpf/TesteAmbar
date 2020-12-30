@@ -1,1 +1,23 @@
 b22460a8b91ac5f1d48f5b7029891b53
+
+class Cidade(db_alchemy.Model):
+    id = db_alchemy.Column(db_alchemy.Integer, primary_key=True)
+    nome_cidade = db_alchemy.Column(db_alchemy.String(255), nullable=False)
+    nome_estado = db_alchemy.Column(db_alchemy.String(255), nullable=False)
+    nome_pais = db_alchemy.Column(db_alchemy.String(255), nullable=False)
+
+    def __repr__(self):
+        return '<Cidade={self.nome_cidade}, Estado={self.nome_estado}, Pais={self.nome_pais}>'
+
+class FatoTable(db_alchemy.Model):
+    id = db_alchemy.Column(db_alchemy.Integer, primary_key=True)
+    cidade_id = db_alchemy.Column(db_alchemy.Integer, db_alchemy.ForeignKey('cidade.id'), nullable=False)
+    data = db_alchemy.Column(db_alchemy.String(15), nullable=False)
+    rain_prec = db_alchemy.Column(db_alchemy.Float, nullable=False)
+    rain_prob = db_alchemy.Column(db_alchemy.Float, nullable=False)
+    temp_max = db_alchemy.Column(db_alchemy.Float, nullable=False)
+    temp_min = db_alchemy.Column(db_alchemy.Float, nullable=False)
+    
+    def __repr__(self):
+        return '<Chuva_Prec={self.rain_prec}, Chuva_Prob={self.rain_prob}, \
+            Temperatura_Max={self.temp_max}, Temperatura_Min={self.temp_min}>'

@@ -1,3 +1,4 @@
 ./app/keys
 __pycache__/
 commit.sh
+.gitignore

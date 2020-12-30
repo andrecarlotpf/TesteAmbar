@@ -43,7 +43,7 @@ def insert_into_db(forecast_json):
     
     with connecta_banco() as con:
         for tupla in l:
-            con.cursor().execute('INSERT OR IGNORE INTO Forecast VALUES (NULL,?,?,?,?,?,?,?,?)', tupla)
+            con.cursor().execute('INSERT OR REPLACE INTO Forecast VALUES (NULL,?,?,?,?,?,?,?,?)', tupla)
             con.commit()
     return 1
 
@@ -70,4 +70,7 @@ def formata_retorno(retorno):
         l.append({'cidade':linha[0], 'temperatura_max':linha[1],'precipitacao_avg':linha[2]})
     
     return l
+
+
+
 
