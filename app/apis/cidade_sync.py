@@ -9,6 +9,7 @@ cidadesync_model_request = api.model('CidadeSyncRequest',{
                                     description='Id da cidade que sera sincronizado')
 })
 
+
 cidadesync_parser = reqparse.RequestParser()
 cidadesync_parser.add_argument('id_cidade', type=int, help='Id da cidade para sincronizar',
 required=True)
