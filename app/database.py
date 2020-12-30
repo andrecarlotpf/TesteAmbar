@@ -10,16 +10,23 @@ def create_database():
 
     cursor = conn.cursor()
 
-    cursor.execute('''CREATE TABLE Forecast 
-                        (id INTEGER primary key, nome_cidade TEXT,nome_estado TEXT,
-                        nome_pais TEXT, data TEXT,chuva_prec REAL, chuva_prob REAL,
-                        temperature_max REAL, temperature_min REAL)''')
+    cursor.execute('''CREATE TABLE Forecast (
+                        id INTEGER primary key, 
+                        nome_cidade TEXT NOT NULL,
+                        nome_estado TEXT NOT NULL,
+                        nome_pais TEXT NOT NULL, 
+                        data TEXT NOT NULL,
+                        chuva_prec REAL NOT NULL, 
+                        chuva_prob REAL NOT NULL,
+                        temperature_max REAL NOT NULL, 
+                        temperature_min REAL NOT NULL,
+                        UNIQUE(nome_cidade, data))''')
     conn.close()
     return 1
 
 
 def insert_into_db(forecast_json):
-
+    
     cidade = forecast_json['name']
     estado = forecast_json['state']
     pais = forecast_json['country']
@@ -35,6 +42,7 @@ def insert_into_db(forecast_json):
                         rain_prob, temp_max, temp_min)))
     
     with connecta_banco() as con:
+        
         con.cursor().executemany('INSERT INTO Forecast VALUES (NULL,?,?,?,?,?,?,?,?)', l)
         con.commit()
         
@@ -43,7 +51,7 @@ def insert_into_db(forecast_json):
 def analise(data_inicial, data_final):
 
     with connecta_banco() as con:
-        #con.text_factory=bytes
+        
         sql = '''
                 SELECT F.nome_cidade, F.temperature_max,
 	                (SELECT AVG(chuva_prec) FROM FORECAST WHERE F.nome_cidade = nome_cidade)
@@ -61,6 +69,6 @@ def formata_retorno(retorno):
     l = []
     for linha in retorno:
         l.append({'cidade':linha[0], 'temperatura_max':linha[1],'precipitacao_avg':linha[2]})
-    print(l)
+    
     return l
 
